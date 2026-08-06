@@ -25,6 +25,7 @@ fn main() -> eframe::Result<()> {
         return Ok(());
     }
 
+
     let (tx, rx) = channel::<String>();
 
     let options = eframe::NativeOptions {
