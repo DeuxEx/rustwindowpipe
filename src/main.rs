@@ -34,10 +34,14 @@ fn main() -> eframe::Result<()> {
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_title("KeepOnTopWindow")
-            .with_inner_size([600.0, 400.0]),
+        .with_title("KeepOnTopWindow")
+        .with_inner_size([600.0, 400.0])
+        .with_always_on_top()
+        // Tvinga fönstret att dekoreras som en popup/dialogvy
+        .with_decorations(true),
         ..Default::default()
     };
+
 
     eframe::run_native(
         "Rust GUI",
