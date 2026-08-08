@@ -8,11 +8,15 @@ use std::thread;
 
 
 
+static PIPE_PATH: &str = "/tmp/rust_gui_pipe";
+
+
+
 fn main() -> eframe::Result<()> {
     let args: Vec<String> = env::args().collect();
 
     if !args.contains(&"--daemon".to_string()) {
-        let current_exe = env::current_exe().expect("Kunde inte hitta binären");
+        let current_exe = env::current_exe().expect("Couldnt find binary");
 
         Command::new(current_exe)
             .arg("--daemon")
@@ -20,7 +24,7 @@ fn main() -> eframe::Result<()> {
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-            .expect("Kunde inte starta processen i bakgrunden");
+            .expect("Couldnt start process in the background");
 
         return Ok(());
     }
@@ -44,11 +48,10 @@ fn main() -> eframe::Result<()> {
 
             // Starta tråden med tillgång till både tx och ctx
             thread::spawn(move || {
-                let pipe_path = "/tmp/rust_gui_pipe";
-                let _ = Command::new("mkfifo").arg(pipe_path).status();
+                let _ = Command::new("mkfifo").arg(PIPE_PATH).status();
 
                 loop {
-                    if let Ok(file) = OpenOptions::new().read(true).open(pipe_path) {
+                    if let Ok(file) = OpenOptions::new().read(true).open(PIPE_PATH) {
                         let reader = BufReader::new(file);
                         for line in reader.lines().flatten() {
                             // 1. Skicka raden till kanalen
@@ -71,6 +74,8 @@ struct MyApp {
     rx: Receiver<String>,
     logs: Vec<String>,
 }
+
+
 
 impl MyApp {
     fn new(rx: Receiver<String>) -> Self {
